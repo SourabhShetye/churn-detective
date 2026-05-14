@@ -1,0 +1,290 @@
+/*
+ * app/assets/style.css
+ * --------------------
+ * Supplementary stylesheet for Churn Detective dashboard.
+ * Core styles live inline in streamlit_app.py (required for Streamlit's
+ * st.markdown injection). This file holds reusable component classes that
+ * can be loaded via st.markdown(open("app/assets/style.css").read()) if
+ * needed for page-specific overrides.
+ *
+ * Design tokens (must stay in sync with streamlit_app.py :root block)
+ * -------------------------------------------------------------------
+ * --navy-950  : #080d1a   Page background
+ * --navy-900  : #0d1526   Sidebar background
+ * --navy-800  : #111e35   Card / panel background
+ * --navy-700  : #1a2d4e   Borders, grid lines
+ * --navy-600  : #243d66   Active borders
+ * --teal-400  : #2dd4bf   Primary accent
+ * --teal-300  : #5eead4   Metric values, highlights
+ * --amber-400 : #fbbf24   Warning / benchmark lines
+ * --amber-300 : #fcd34d   Warning text
+ * --rose-400  : #fb7185   Danger / negative signal
+ * --slate-300 : #cbd5e1   Body text
+ * --slate-400 : #94a3b8   Secondary text
+ * --slate-500 : #64748b   Muted labels
+ * --white     : #f8fafc   Headings
+ */
+
+/* ── Reset helpers ───────────────────────────────────────────────────── */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* ── KPI / metric cards ──────────────────────────────────────────────── */
+.kpi-card {
+    background    : #111e35;
+    border        : 1px solid #243d66;
+    border-radius : 12px;
+    padding       : 1.25rem 1.5rem;
+    box-shadow    : 0 4px 24px rgba(0, 0, 0, 0.35);
+    transition    : border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kpi-card:hover {
+    border-color : #2dd4bf;
+    box-shadow   : 0 4px 32px rgba(45, 212, 191, 0.12);
+}
+
+.kpi-card__label {
+    font-family    : 'DM Sans', sans-serif;
+    font-size      : 0.72rem;
+    text-transform : uppercase;
+    letter-spacing : 0.1em;
+    color          : #94a3b8;
+    margin-bottom  : 0.4rem;
+}
+
+.kpi-card__value {
+    font-family : 'DM Mono', monospace;
+    font-size   : 2rem;
+    font-weight : 500;
+    color       : #5eead4;
+    line-height : 1.1;
+}
+
+.kpi-card__delta {
+    font-family : 'DM Mono', monospace;
+    font-size   : 0.78rem;
+    color       : #64748b;
+    margin-top  : 0.3rem;
+}
+
+.kpi-card__delta--positive { color: #34d399; }
+.kpi-card__delta--negative { color: #fb7185; }
+
+/* ── Persona / segment cards ─────────────────────────────────────────── */
+.persona-card {
+    background    : #111e35;
+    border        : 1px solid #1a2d4e;
+    border-radius : 12px;
+    padding       : 1.25rem 1.5rem;
+    margin-bottom : 1rem;
+    transition    : border-color 0.2s ease;
+}
+
+.persona-card:hover {
+    border-color : #243d66;
+}
+
+.persona-card__icon {
+    font-size     : 1.8rem;
+    margin-bottom : 0.5rem;
+    display       : block;
+}
+
+.persona-card__name {
+    font-family   : 'DM Sans', sans-serif;
+    font-size     : 1rem;
+    font-weight   : 600;
+    color         : #f8fafc;
+    margin        : 0 0 0.4rem 0;
+}
+
+.persona-card__description {
+    font-family : 'DM Sans', sans-serif;
+    font-size   : 0.85rem;
+    color       : #94a3b8;
+    line-height : 1.6;
+    margin      : 0 0 0.6rem 0;
+}
+
+.persona-card__play {
+    font-family   : 'DM Sans', sans-serif;
+    font-size     : 0.82rem;
+    color         : #2dd4bf;
+    font-style    : italic;
+    padding-top   : 0.5rem;
+    border-top    : 1px solid #1a2d4e;
+    margin-top    : 0.5rem;
+}
+
+/* ── Driver / insight cards ──────────────────────────────────────────── */
+.driver-card {
+    background    : #111e35;
+    border        : 1px solid #1a2d4e;
+    border-left   : 3px solid #2dd4bf;
+    border-radius : 10px;
+    padding       : 1.25rem 1.5rem;
+    margin-bottom : 1rem;
+}
+
+.driver-card__tag {
+    display        : inline-block;
+    background     : rgba(45, 212, 191, 0.12);
+    color          : #5eead4;
+    font-family    : 'DM Mono', monospace;
+    font-size      : 0.72rem;
+    padding        : 0.15rem 0.65rem;
+    border-radius  : 999px;
+    margin-bottom  : 0.5rem;
+    text-transform : uppercase;
+    letter-spacing : 0.08em;
+}
+
+.driver-card__title {
+    font-family : 'DM Sans', sans-serif;
+    font-size   : 1rem;
+    font-weight : 600;
+    color       : #f8fafc;
+    margin      : 0 0 0.5rem 0;
+}
+
+.driver-card__body {
+    font-family : 'DM Sans', sans-serif;
+    font-size   : 0.875rem;
+    color       : #94a3b8;
+    line-height : 1.65;
+    margin      : 0;
+}
+
+/* ── Stat pills ──────────────────────────────────────────────────────── */
+.stat-pill {
+    display       : inline-block;
+    background    : #1a2d4e;
+    color         : #5eead4;
+    font-family   : 'DM Mono', monospace;
+    font-size     : 0.75rem;
+    padding       : 0.2rem 0.65rem;
+    border-radius : 999px;
+    margin        : 0.15rem 0.2rem;
+}
+
+.stat-pill--amber { color: #fcd34d; }
+.stat-pill--rose  { color: #fb7185; }
+
+/* ── Section labels ──────────────────────────────────────────────────── */
+.section-label {
+    font-family    : 'DM Mono', monospace;
+    font-size      : 0.7rem;
+    text-transform : uppercase;
+    letter-spacing : 0.12em;
+    color          : #64748b;
+    margin-bottom  : 0.5rem;
+    display        : block;
+}
+
+/* ── Warning / assumption boxes ──────────────────────────────────────── */
+.warning-box {
+    background    : rgba(251, 191, 36, 0.08);
+    border        : 1px solid rgba(251, 191, 36, 0.3);
+    border-radius : 8px;
+    padding       : 0.875rem 1.25rem;
+    font-family   : 'DM Sans', sans-serif;
+    font-size     : 0.875rem;
+    color         : #fcd34d;
+    margin        : 0.75rem 0;
+    line-height   : 1.6;
+}
+
+.info-box {
+    background    : rgba(45, 212, 191, 0.06);
+    border        : 1px solid rgba(45, 212, 191, 0.25);
+    border-radius : 8px;
+    padding       : 0.875rem 1.25rem;
+    font-family   : 'DM Sans', sans-serif;
+    font-size     : 0.875rem;
+    color         : #5eead4;
+    margin        : 0.75rem 0;
+    line-height   : 1.6;
+}
+
+.danger-box {
+    background    : rgba(251, 113, 133, 0.08);
+    border        : 1px solid rgba(251, 113, 133, 0.3);
+    border-radius : 8px;
+    padding       : 0.875rem 1.25rem;
+    font-family   : 'DM Sans', sans-serif;
+    font-size     : 0.875rem;
+    color         : #fda4af;
+    margin        : 0.75rem 0;
+    line-height   : 1.6;
+}
+
+/* ── Quadrant cards ──────────────────────────────────────────────────── */
+.quadrant-card {
+    background    : #111e35;
+    border        : 1px solid #1a2d4e;
+    border-radius : 10px;
+    padding       : 1.1rem 1.25rem;
+    text-align    : center;
+    transition    : border-color 0.2s ease;
+}
+
+.quadrant-card--primary {
+    border-top : 3px solid #2dd4bf;
+}
+
+.quadrant-card__name {
+    font-family : 'DM Sans', sans-serif;
+    font-size   : 0.95rem;
+    font-weight : 600;
+    color       : #f8fafc;
+    margin      : 0.4rem 0 0.25rem 0;
+}
+
+.quadrant-card__desc {
+    font-family : 'DM Sans', sans-serif;
+    font-size   : 0.8rem;
+    color       : #94a3b8;
+    margin      : 0;
+}
+
+/* ── Data table overrides ────────────────────────────────────────────── */
+.dataframe-container {
+    border        : 1px solid #1a2d4e;
+    border-radius : 10px;
+    overflow      : hidden;
+}
+
+/* ── Download button ─────────────────────────────────────────────────── */
+.download-btn {
+    display         : inline-flex;
+    align-items     : center;
+    gap             : 0.4rem;
+    background      : transparent;
+    color           : #2dd4bf;
+    border          : 1px solid #2dd4bf;
+    border-radius   : 8px;
+    padding         : 0.5rem 1.25rem;
+    font-family     : 'DM Mono', monospace;
+    font-size       : 0.85rem;
+    letter-spacing  : 0.04em;
+    cursor          : pointer;
+    text-decoration : none;
+    transition      : background 0.2s, color 0.2s;
+}
+
+.download-btn:hover {
+    background : #2dd4bf;
+    color      : #080d1a;
+}
+
+/* ── Branding footer ─────────────────────────────────────────────────── */
+.brand-footer {
+    font-family    : 'DM Mono', monospace;
+    font-size      : 0.7rem;
+    color          : #475569;
+    text-align     : center;
+    padding        : 1rem 0 0.5rem 0;
+    letter-spacing : 0.06em;
+}
