@@ -1,6 +1,5 @@
-Live demo: [URL]
-Repo: [URL]
-Demo video: [URL]
+Live demo: https://churn-detective-l6ptabi8tjgc66nfduiumf.streamlit.app
+Repo: https://github.com/SourabhShetye/churn-detective
 
 Churn Detective applies a LightGBM churn classifier with SHAP explainability, KMeans customer segmentation, and an S-Learner uplift model in a Streamlit app.
 
@@ -30,6 +29,3 @@ python src/segment.py
 - a model registry and scheduled retraining pipeline
 - campaign measurement and ROI tracking for uplift offers
 
-![Screenshot](link)
-
-This project is released under the MIT License.
