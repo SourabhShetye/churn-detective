@@ -150,8 +150,10 @@ if "churn_proba" in df.columns and "uplift_score" in df.columns:
         marker=dict(size=6, color="#f8fafc"),
         hovertemplate="Decile %{x}<br>Cumulative: %{y:.1f}%<extra></extra>",
     ))
+    base_layout = PLOT_TEMPLATE["layout"].to_plotly_json()
+    base_layout.pop("yaxis", None)
     fig.update_layout(
-        **PLOT_TEMPLATE["layout"].to_plotly_json(),
+        **base_layout,
         height=360,
         xaxis_title="Score Decile (1 = highest uplift)",
         yaxis=dict(title="% of Total Uplift", gridcolor="#1a2d4e"),
