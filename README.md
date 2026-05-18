@@ -1,4 +1,5 @@
 Live demo: https://churn-detective-l6ptabi8tjgc66nfduiumf.streamlit.app
+
 Repo: https://github.com/SourabhShetye/churn-detective
 
 Churn Detective applies a LightGBM churn classifier with SHAP explainability, KMeans customer segmentation, and an S-Learner uplift model in a Streamlit app.
