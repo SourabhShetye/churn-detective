@@ -331,8 +331,9 @@ def load_artifacts():
             missing.append(filename)
 
     if missing:
-        artifacts["DEMO_MODE"] = True
-        artifacts["_missing"]  = missing
+        import streamlit as st
+        st.error(f"Missing models: {missing}. Run notebooks to generate them.")
+        st.stop()
 
     return artifacts
 
@@ -351,71 +352,12 @@ def load_data():
 
     if test_path.exists():
         df = pd.read_parquet(test_path)
-        return df, False   # (dataframe, is_demo)
+        return df
+    else:
+        import streamlit as st
+        st.error(f"Data not found at {test_path}. Please run notebooks first.")
+        st.stop()
 
-    # ── Demo mode: generate synthetic data matching schema ───────────────
-    rng = np.random.default_rng(42)
-    n   = 1_400   # ~20% of 7000 as test set
-
-    contract_types   = ["Month-to-month", "One year", "Two year"]
-    internet_types   = ["DSL", "Fiber optic", "No"]
-    payment_methods  = ["Electronic check", "Mailed check", "Bank transfer (auto)", "Credit card (auto)"]
-    yes_no           = ["Yes", "No"]
-
-    df = pd.DataFrame({
-        "customer_id":            [f"CUST{50000+i}" for i in range(n)],
-        "tenure_months":          rng.integers(1, 73, n),
-        "contract_type":          rng.choice(contract_types, n, p=[0.55, 0.26, 0.19]),
-        "monthly_charges":        rng.uniform(20, 120, n).round(2),
-        "total_charges":          rng.uniform(20, 8000, n).round(2),
-        "internet_service":       rng.choice(internet_types, n, p=[0.35, 0.45, 0.20]),
-        "online_security":        rng.choice(yes_no, n),
-        "tech_support":           rng.choice(yes_no, n),
-        "streaming_tv":           rng.choice(yes_no, n),
-        "payment_method":         rng.choice(payment_methods, n),
-        "paperless_billing":      rng.choice(yes_no, n),
-        "senior_citizen":         rng.choice([0, 1], n, p=[0.84, 0.16]),
-        "partner":                rng.choice(yes_no, n),
-        "dependents":             rng.choice(yes_no, n),
-        "phone_service":          rng.choice(yes_no, n, p=[0.9, 0.1]),
-        "multiple_lines":         rng.choice(yes_no, n),
-        "support_calls_3mo":      rng.integers(0, 8, n),
-        "avg_data_gb_3mo":        rng.uniform(0, 120, n).round(2),
-        "late_payments_6mo":      rng.integers(0, 5, n),
-        "plan_changes_6mo":       rng.integers(0, 4, n),
-        "churned":                rng.choice([0, 1], n, p=[0.638, 0.362]),
-    })
-
-    # Add engineered features for demo
-    df["service_frustration_index"] = df["support_calls_3mo"] + df["late_payments_6mo"]
-    df["charges_per_tenure_month"]  = (df["total_charges"] / (df["tenure_months"] + 1)).round(2)
-    df["is_new_customer"]           = (df["tenure_months"] <= 6).astype(int)
-    df["is_long_tenure"]            = (df["tenure_months"] >= 48).astype(int)
-
-    # Synthetic model outputs
-    churn_signal = (
-        0.35 * (df["contract_type"] == "Month-to-month").astype(float)
-        + 0.20 * (df["support_calls_3mo"] / 7)
-        + 0.15 * (df["monthly_charges"] / 120)
-        + 0.15 * (1 - df["tenure_months"] / 72)
-        + 0.15 * rng.uniform(0, 1, n)
-    )
-    df["churn_proba"] = np.clip(churn_signal, 0.05, 0.95).round(4)
-
-    # Synthetic ITE — higher for mid-churn-prob customers (true persuadables)
-    df["uplift_score"] = (
-        0.4 * np.exp(-((df["churn_proba"] - 0.6) ** 2) / 0.08)
-        + 0.2 * (df["support_calls_3mo"] / 7)
-        + 0.4 * rng.uniform(0, 1, n)
-    ).round(4)
-
-    # Synthetic segments
-    seg_map = {0: "💸 Price-Sensitive Shoppers", 1: "😤 Frustrated Early Adopters",
-               2: "🌙 Quietly Disengaging Veterans", 3: "⚠️ At-Risk Budget Customers"}
-    df["segment_label"] = rng.choice(list(seg_map.values()), n,
-                                     p=[0.32, 0.28, 0.22, 0.18])
-
-    return df, True   # (dataframe, is_demo)
 
 
 # ---------------------------------------------------------------------------
@@ -428,9 +370,8 @@ if "artifacts" not in st.session_state:
     st.session_state.artifacts = load_artifacts()
 
 if "df" not in st.session_state:
-    df, is_demo = load_data()
-    st.session_state.df      = df
-    st.session_state.is_demo = is_demo
+    st.session_state.df = load_data()
+    st.session_state.is_demo = False
 
 # ---------------------------------------------------------------------------
 # Sidebar — branding + global controls
@@ -480,18 +421,7 @@ with st.sidebar:
 
     st.markdown("---")
 
-    # Demo mode indicator
-    if st.session_state.get("is_demo", True):
-        st.markdown("""
-        <div class="warning-box">
-            ⚠️ <strong>Demo mode</strong><br>
-            Displaying synthetic data. Drop your CSV into
-            <code>data/raw/</code> and run the notebooks to activate
-            live model outputs.
-        </div>
-        """, unsafe_allow_html=True)
-    else:
-        st.success("✅ Live model — real data loaded")
+    st.success("✅ Live model — real data loaded")
 
     st.markdown("---")
 

@@ -284,38 +284,8 @@ with shap_col:
     if os.path.exists(shap_fig_path):
         st.image(shap_fig_path, caption="SHAP Global Feature Importance (test set)")
     else:
-        # Synthetic SHAP bar for demo
-        features = [
-            "contract_type", "tenure_months", "support_calls_3mo",
-            "monthly_charges", "internet_service", "charges_per_tenure_month",
-            "payment_is_manual", "online_security", "avg_data_gb_3mo",
-            "service_frustration_index",
-        ]
-        importances = [0.41, 0.31, 0.24, 0.18, 0.16, 0.13, 0.10, 0.09, 0.07, 0.06]
-
-        fig = go.Figure(go.Bar(
-            x=importances[::-1],
-            y=features[::-1],
-            orientation="h",
-            marker=dict(
-                color=importances[::-1],
-                colorscale=[[0, "#1a2d4e"], [0.5, "#2dd4bf"], [1.0, "#5eead4"]],
-                showscale=False,
-            ),
-            text=[f"{v:.2f}" for v in importances[::-1]],
-            textposition="outside",
-            textfont=dict(family="DM Mono", size=11, color="#cbd5e1"),
-        ))
-        fig.update_layout(
-            **PLOT_TEMPLATE["layout"].to_plotly_json(),
-            height=380,
-            xaxis_title="Mean |SHAP value|",
-            margin=dict(t=10, b=20, l=160, r=60),
-        )
-        st.plotly_chart(fig, use_container_width=True)
-        if is_demo:
-            st.caption("⚠️ Demo mode — synthetic SHAP values shown. "
-                       "Run notebook 02_baseline_model.ipynb to generate real SHAP output.")
+        import streamlit as st
+        st.error(f"SHAP figure not found at {shap_fig_path}. Run notebooks.")
 
 with legend_col:
     st.markdown("""

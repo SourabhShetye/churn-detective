@@ -99,17 +99,13 @@ with result_col:
     st.markdown("### Campaign Results")
 
     if "churn_proba" not in df.columns or df.empty:
-        st.info("Run notebook 02_baseline_model.ipynb to generate churn probabilities.")
-        # Synthetic sweep for demo
-        thresholds = np.linspace(0.10, 0.90, 161)
-        n = 1400
-        rng = np.random.default_rng(42)
-        proba = rng.beta(2, 4, n)
-        y_true = (proba + rng.normal(0, 0.15, n) > 0.5).astype(int)
-    else:
-        proba  = df["churn_proba"].values
-        y_true = df["churned"].values if "churned" in df.columns else (proba > 0.5).astype(int)
-        thresholds = np.linspace(0.10, 0.90, 161)
+        import streamlit as st
+        st.error("Run notebook 02_baseline_model.ipynb to generate churn probabilities.")
+        st.stop()
+        
+    proba  = df["churn_proba"].values
+    y_true = df["churned"].values if "churned" in df.columns else (proba > 0.5).astype(int)
+    thresholds = np.linspace(0.10, 0.90, 161)
 
     # Compute sweep
     sweep_rows = []

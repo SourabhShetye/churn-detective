@@ -231,7 +231,6 @@ else:
     Run **notebook 04_uplift_modeling.ipynb** to generate `churn_proba` and `uplift_score` columns,
     then save the enriched dataset to `data/processed/test.parquet`.
 
-    In demo mode, synthetic scores are displayed on the home page only.
     """)
 
 st.markdown("---")
