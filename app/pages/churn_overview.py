@@ -96,6 +96,16 @@ st.markdown(
 )
 st.markdown("---")
 
+st.markdown("""
+<div style="background:rgba(45,212,191,0.06); border:1px solid rgba(45,212,191,0.2);
+            border-radius:8px; padding:0.75rem 1.25rem; font-size:0.85rem; color:#5eead4;
+            margin-bottom:1rem;">
+    <strong>ℹ️ This page shows historical churn patterns across all 1,400 test customers.</strong>
+    These rates do not change with the threshold — they reflect why churn happens in the data.
+    Use the <strong>Retention Simulator</strong> to see threshold-dependent campaign economics.
+</div>
+""", unsafe_allow_html=True)
+
 if df.empty:
     st.warning("No data loaded. Return to the home page.")
     st.stop()

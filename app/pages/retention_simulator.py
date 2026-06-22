@@ -74,8 +74,8 @@ with param_col:
     offer_cost = st.slider("Offer cost", 5.0, 60.0, 15.0, 1.0, label_visibility="collapsed")
 
     st.markdown('<div class="section-label" style="margin-top:1rem;">Retention success rate (%)</div>', unsafe_allow_html=True)
-    success_rate = st.slider("Success rate", 0.05, 0.60, 0.30, 0.01, label_visibility="collapsed",
-                             format="%.0f%%") / 1   # slider returns 0.05–0.60
+    success_rate_pct = st.slider("Success rate", 5, 60, 30, 1, label_visibility="collapsed", format="%d%%")
+    success_rate = success_rate_pct / 100
 
     st.markdown('<div class="section-label" style="margin-top:1rem;">Avg customer lifetime (months)</div>', unsafe_allow_html=True)
     lifetime_mo = st.slider("Lifetime months", 6, 48, 24, 1, label_visibility="collapsed")

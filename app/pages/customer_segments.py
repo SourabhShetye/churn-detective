@@ -63,6 +63,7 @@ SEGMENT_COLORS = {
 DEFAULT_COLOR = "#94a3b8"
 
 df        = st.session_state.get("df", pd.DataFrame())
+threshold = st.session_state.get("global_threshold", 0.50)
 is_demo   = st.session_state.get("is_demo", True)
 
 st.markdown("## 👥 Customer Segments")
@@ -73,11 +74,24 @@ if df.empty or "segment_label" not in df.columns:
     st.warning("Segment labels not yet available. Run notebook 03_segmentation.ipynb first.")
     st.stop()
 
-churners = df[df["churned"] == 1] if "churned" in df.columns else df
+# Show ALL historical churners for persona cards (full picture of the problem)
+all_churners = df[df["churned"] == 1].copy() if "churned" in df.columns else df.copy()
+
+# Flagged churners = above current threshold (for threshold-responsive stats)
+if "churned" in df.columns and "churn_proba" in df.columns:
+    churners = df[(df["churned"] == 1) & (df["churn_proba"] >= threshold)].copy()
+else:
+    churners = all_churners.copy()
 
 # ── Persona summary cards ─────────────────────────────────────────────────
 
 st.markdown("### Churner Personas")
+st.markdown(
+    f'<p style="color:#94a3b8; font-size:0.875rem;">Showing <strong style="color:#5eead4;">'
+    f'{len(churners):,} churners</strong> flagged at threshold p ≥ {threshold:.2f} '
+    f'(out of {len(all_churners):,} total churners in dataset).</p>',
+    unsafe_allow_html=True
+)
 
 PERSONA_META = {
     "💸 Price-Sensitive Shoppers": {
@@ -102,11 +116,24 @@ PERSONA_META = {
     },
 }
 
-cols = st.columns(4)
-segs = churners["segment_label"].value_counts()
+# Get segment counts from flagged churners
+segs = churners["segment_label"].value_counts() if not churners.empty else pd.Series(dtype=int)
 
-for col, (seg_name, meta) in zip(cols, PERSONA_META.items()):
-    n   = segs.get(seg_name, 0)
+# Only show personas that exist in the data
+existing_personas = {
+    name: meta for name, meta in PERSONA_META.items()
+    if name in all_churners["segment_label"].values
+}
+
+# If no personas found, fall back to all
+if not existing_personas:
+    existing_personas = PERSONA_META
+
+cols = st.columns(max(len(existing_personas), 1))
+
+for col, (seg_name, meta) in zip(cols, existing_personas.items()):
+    n   = int(segs.get(seg_name, 0))
+    total_in_seg = int(all_churners["segment_label"].eq(seg_name).sum())
     pct = n / len(churners) * 100 if len(churners) > 0 else 0
     avg_rev = churners.loc[churners["segment_label"] == seg_name, "monthly_charges"].mean() \
               if n > 0 else 0
@@ -115,10 +142,11 @@ for col, (seg_name, meta) in zip(cols, PERSONA_META.items()):
     <div class="persona-card" style="border-top: 3px solid {meta['color']};">
         <div style="font-size:1.8rem;">{meta['icon']}</div>
         <h4>{seg_name}</h4>
-        <span class="stat-pill">{n:,} customers</span>
-        <span class="stat-pill">{pct:.0f}% of churners</span>
+        <span class="stat-pill">{n:,} flagged</span>
+        <span class="stat-pill">{total_in_seg:,} total</span>
+        <span class="stat-pill">{pct:.0f}% of flagged</span>
         <p style="margin-top:0.6rem; color:#94a3b8; font-size:0.82rem;">
-            Avg revenue: <strong style="color:{meta['color']};">${avg_rev:.0f}/mo</strong>
+            Avg revenue (flagged): <strong style="color:{meta['color']};">${avg_rev:.0f}/mo</strong>
         </p>
         <p style="margin-top:0.4rem; font-size:0.8rem; color:#64748b; font-style:italic;">
             ▶ {meta['play']}
@@ -181,7 +209,10 @@ st.markdown("---")
 # ── Segment deep-dive ─────────────────────────────────────────────────────
 
 st.markdown("### Segment Deep-Dive")
-selected = st.selectbox("Select a persona", list(PERSONA_META.keys()))
+available_segs = [s for s in PERSONA_META.keys() if s in all_churners["segment_label"].values]
+if not available_segs:
+    available_segs = list(PERSONA_META.keys())
+selected = st.selectbox("Select a persona", available_segs)
 sub = churners[churners["segment_label"] == selected]
 
 if sub.empty:
